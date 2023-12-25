@@ -23,6 +23,7 @@
  * * Make all the items that are listed in the favorites LS save the red background color when the page is reloaded
  */
 
+
 /**
  * @hint
  * Here is a plan of how you can structure your code. You can follow it or choose your own way to go
@@ -38,3 +39,69 @@
  */
 
 // Your code goes here...
+const container = document.querySelector(".cardsContainer");
+const favorites = "favorites";
+const dataFav = "data-fav";
+const root = document.documentElement;
+
+function getStoredFavorites() {
+    return localStorage.getItem(favorites) || "";
+}
+
+function setStoredFavorites(value) {
+    localStorage.setItem(favorites, value);
+}
+
+function initializeBoxes() {
+    const storedFavorites = getStoredFavorites();
+    const initialItems = storedFavorites ? storedFavorites.split(', ') : [];
+
+    initialItems.forEach(id => {
+        const item = document.getElementById(id);
+        if (item) {
+            updateBoxState(item, true);
+        }
+    });
+}
+
+function updateBoxState(box, isFavorite) {
+    const newState = isFavorite ? "true" : "false";
+    box.dataset.fav = newState;
+    root.setAttribute(dataFav, newState);
+
+    if (isFavorite) {
+        box.classList.add("red");
+    } else {
+        box.classList.remove("red");
+    }
+}
+
+function addToLocalStorage(id) {
+    const curValue = getStoredFavorites();
+    const newValue = curValue.length === 0 ? id : `${curValue}, ${id}`;
+    setStoredFavorites(newValue);
+}
+
+function callbackFn(e) {
+    const box = e.target;
+    console.log(box);
+
+    const isFavorite = box.dataset.fav === "true";
+    
+    updateBoxState(box, !isFavorite);
+    
+    if (!isFavorite) {
+        addToLocalStorage(box.id);
+    } else {
+        const newList = document.querySelectorAll("[data-fav]");
+        const storageArr = Array.from(newList)
+            .filter(item => item.dataset.fav === "true")
+            .map(item => item.id)
+            .join(", ");
+        setStoredFavorites(storageArr);
+    }
+}
+
+container.addEventListener("click", callbackFn);
+
+initializeBoxes();
