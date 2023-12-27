@@ -66,8 +66,7 @@ function initializeBoxes() {
 
 function updateBoxState(box, isFavorite) {
     const newState = isFavorite ? "true" : "false";
-    box.dataset.fav = newState;
-    root.setAttribute(dataFav, newState);
+    box.setAttribute(dataFav, newState);
 
     if (isFavorite) {
         box.classList.add("red");
@@ -83,22 +82,22 @@ function addToLocalStorage(id) {
 }
 
 function callbackFn(e) {
-    const box = e.target;
-    console.log(box);
-
-    const isFavorite = box.dataset.fav === "true";
+    const box = e.target.closest(".card"); 
     
-    updateBoxState(box, !isFavorite);
-    
-    if (!isFavorite) {
-        addToLocalStorage(box.id);
-    } else {
-        const newList = document.querySelectorAll("[data-fav]");
-        const storageArr = Array.from(newList)
-            .filter(item => item.dataset.fav === "true")
-            .map(item => item.id)
-            .join(", ");
-        setStoredFavorites(storageArr);
+    if (box) {
+        const isFavorite = box.getAttribute(dataFav) === "true";
+        
+        updateBoxState(box, !isFavorite);
+        
+        if (!isFavorite) {
+            addToLocalStorage(box.id);
+        } else {
+            const newList = document.querySelectorAll(".card[" + dataFav + "='true']");
+            const storageArr = Array.from(newList)
+                .map(item => item.id)
+                .join(", ");
+            setStoredFavorites(storageArr);
+        }
     }
 }
 
